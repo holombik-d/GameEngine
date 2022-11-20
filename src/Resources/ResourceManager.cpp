@@ -4,6 +4,10 @@
 #include <iostream>
 #include <fstream>
 
+#define STB_IMAGE_IMPLEMENTATION
+#define STBI_ONLY_PNG
+#include "stb_image.h"
+
 ResourceManager::ResourceManager(const std::string& executablePath)
 {
 	std::size_t found = executablePath.find_last_of("/\\");
@@ -63,4 +67,23 @@ std::string ResourceManager::GetFileString(const std::string& relativeFilePath)
 	std::stringstream buffer;
 	buffer << file.rdbuf();
 	return buffer.str();
+}
+
+void ResourceManager::LoadTexture(const std::string& textureName, const std::string& texturePath)
+{
+	int channels = 0;
+	int width = 0;
+	int height = 0;
+
+	stbi_set_flip_vertically_on_load(true);
+
+	unsigned char* pixels = stbi_load(std::string(_path + "/" + texturePath).c_str(), &width, &height, &channels, 0);
+
+	if(!pixels)
+	{
+		std::cerr << "Can`t load texture: " << texturePath << std::endl;
+	}
+
+	stbi_image_free(pixels);
+
 }

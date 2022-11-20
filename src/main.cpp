@@ -67,17 +67,16 @@ int main(int argc, char** argv)
 
     glClearColor(1, 0, 1, 0);
 
-    
-
     {
-
         ResourceManager resourceManager(argv[0]);
         auto defaultShaderProgram = resourceManager.LoadShader("DefaultShader", "res/shaders/vertex.vs", "res/shaders/fragment.fs");
         if (defaultShaderProgram == false)
         {
             std::cerr << "Can`t create shader program: " << "DefaultShader" << std::endl;
         }
-        
+
+        resourceManager.LoadTexture("DefaultTexture", "res/textures/map_16x16.png");
+
         GLuint pointsVBO = 0;
         glGenBuffers(1, &pointsVBO);
         glBindBuffer(GL_ARRAY_BUFFER, pointsVBO);
