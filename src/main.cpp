@@ -2,6 +2,7 @@
 #include <GLFW/glfw3.h>
 
 #include <iostream>
+#include "Renderer/ShaderProgram.h"
 
 GLfloat points[] =
 {
@@ -83,21 +84,15 @@ int main(void)
 
     glClearColor(1, 0, 1, 0);
 
-    GLuint vs = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vs, 1, &vertexShader, nullptr);
-    glCompileShader(vs);
+    std::string vertex(vertexShader);
+    std::string fragment(fragmentShader);
 
-    GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fs, 1, &fragmentShader, nullptr);
-    glCompileShader(fs);
-
-	GLuint shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vs);
-    glAttachShader(shaderProgram, fs);
-    glLinkProgram(shaderProgram);
-
-    glDeleteShader(vs);
-    glDeleteShader(fs);
+    Renderer::ShaderProgram shaderProgram(vertex, fragment);
+    if(shaderProgram.isCompiled() == false)
+    {
+        std::cerr << "cant create shader" << std::endl;
+        return -1;
+    }
 
     GLuint pointsVBO = 0;
     glGenBuffers(1, &pointsVBO);
@@ -128,7 +123,8 @@ int main(void)
         /* Render here */
 		glClear(GL_COLOR_BUFFER_BIT);
 
-        glUseProgram(shaderProgram);
+        shaderProgram.Use();
+
         glBindVertexArray(vao);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
