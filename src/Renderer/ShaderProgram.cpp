@@ -56,6 +56,11 @@ void Renderer::ShaderProgram::Use() const
     glUseProgram(_ID);
 }
 
+void Renderer::ShaderProgram::SetInt(const std::string& name, GLint value)
+{
+    glUniform1i(glGetUniformLocation(_ID, name.c_str()), value);
+}
+
 bool Renderer::ShaderProgram::CreateShader(const std::string& shader, const GLenum shaderType, GLuint& shaderID)
 {
     shaderID = glCreateShader(shaderType);

@@ -11,6 +11,7 @@ namespace Renderer
 		~ShaderProgram();
 		bool isCompiled() const;
 		void Use() const;
+		void SetInt(const std::string &name, GLint value);
 
 		ShaderProgram() = delete;
 		ShaderProgram(ShaderProgram&) = delete;

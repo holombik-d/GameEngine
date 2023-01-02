@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include "Renderer/ShaderProgram.h"
+#include "Renderer/Texture2D.h"
 #include "Resources/ResourceManager.h"
 
 GLfloat points[] =
@@ -17,6 +18,13 @@ GLfloat colors[] =
     1.0f, 0.0f, 0.0f,
     0.0f, 1.f, 0.0f,
     0.0f, 0.0f, 1.0f
+};
+
+GLfloat textureCoords[] =
+{
+    0.5f, 1.0f,
+    1.0f, 0.f,
+    0.0f, 0.0f
 };
 
 int _height = 460;
@@ -75,7 +83,7 @@ int main(int argc, char** argv)
             std::cerr << "Can`t create shader program: " << "DefaultShader" << std::endl;
         }
 
-        resourceManager.LoadTexture("DefaultTexture", "res/textures/map_16x16.png");
+        auto texture = resourceManager.LoadTexture("DefaultTexture", "res/textures/map_16x16.png");
 
         GLuint pointsVBO = 0;
         glGenBuffers(1, &pointsVBO);
@@ -87,6 +95,11 @@ int main(int argc, char** argv)
         glGenBuffers(1, &colorsVBO);
         glBindBuffer(GL_ARRAY_BUFFER, colorsVBO);
         glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STATIC_DRAW);
+
+        GLuint textCord = 0;
+        glGenBuffers(1, &textCord);
+        glBindBuffer(GL_ARRAY_BUFFER, textCord);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(textureCoords), textureCoords, GL_STATIC_DRAW);
 
         GLuint vao = 0;
         glGenVertexArrays(1, &vao);
@@ -100,6 +113,13 @@ int main(int argc, char** argv)
         glBindBuffer(GL_ARRAY_BUFFER, colorsVBO);
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
+        glEnableVertexAttribArray(2);
+        glBindBuffer(GL_ARRAY_BUFFER, textCord);
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+
+        defaultShaderProgram->Use();
+        defaultShaderProgram->SetInt("tex", 0);
+
         /* Loop until the user closes the window */
         while (!glfwWindowShouldClose(window))
         {
@@ -109,6 +129,7 @@ int main(int argc, char** argv)
             defaultShaderProgram->Use();
 
             glBindVertexArray(vao);
+            texture->Bind();
             glDrawArrays(GL_TRIANGLES, 0, 3);
 
             /* Swap front and back buffers */
