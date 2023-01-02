@@ -7,6 +7,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #define STBI_ONLY_PNG
 #include "stb_image.h"
+#include "../Renderer/Texture2D.h"
 
 ResourceManager::ResourceManager(const std::string& executablePath)
 {
@@ -69,7 +70,7 @@ std::string ResourceManager::GetFileString(const std::string& relativeFilePath)
 	return buffer.str();
 }
 
-void ResourceManager::LoadTexture(const std::string& textureName, const std::string& texturePath)
+std::shared_ptr<Renderer::Texture2D> ResourceManager::LoadTexture(const std::string& textureName, const std::string& texturePath)
 {
 	int channels = 0;
 	int width = 0;
@@ -82,8 +83,24 @@ void ResourceManager::LoadTexture(const std::string& textureName, const std::str
 	if(!pixels)
 	{
 		std::cerr << "Can`t load texture: " << texturePath << std::endl;
+		return nullptr;
 	}
 
-	stbi_image_free(pixels);
+	std::shared_ptr<Renderer::Texture2D> newTexture = _textures.emplace(textureName, std::make_shared<Renderer::Texture2D>(width, height, pixels, 
+																		channels, GL_NEAREST, GL_CLAMP_TO_EDGE)).first->second;
 
+	stbi_image_free(pixels);
+	return newTexture;
+}
+
+std::shared_ptr<Renderer::Texture2D> ResourceManager::GetTexture(const std::string& textureName)
+{
+	TexturesMap::const_iterator iterator = _textures.find(textureName);
+	if (iterator != _textures.end())
+	{
+		return iterator->second;
+	}
+
+	std::cerr << "Can`t find the texture: " << textureName;
+	return nullptr;
 }
